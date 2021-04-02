@@ -46,12 +46,9 @@ while True:
     temperature = max_temp * exp(-cou * decay_rate)  # this line decreases temp gradually
     if temperature < min_temp:
         break
-    print(f'-------------------------- temperature : {temperature} ----------------------------')
     for i in range(n):  # for each variable
-        print(f'***************** i= {i} *********************')
-        temp = cal_clause_val(clauses, X)
-        print('clauses val is : ', temp)
-        # ## calculating cost and cost_prime
+        temp = cal_clause_val(clauses, curr)
+        # # calculating cost and cost_prime
         cost = 0
         for q in temp:
             or_res = 0
@@ -59,36 +56,44 @@ while True:
                 or_res = or_(j, or_res)
             if or_res == 1:
                 cost += 1
-        # if cost <= max_now:
-        #     break
-        print('cost is: ', cost)
-        curr[i] = xor(X[i], 1)
+
         cost_prime = 0
-        clauses_val_new = cal_clause_val(clauses, curr)
-        print('clause val new is: ', clauses_val_new)
+        curr_temp = curr[:]
+        curr_temp[i] = xor(curr[i], 1)
+        clauses_val_new = cal_clause_val(clauses, curr_temp)
         for s in clauses_val_new:
             or_res = 0
             for t in s:
                 or_res = or_(t, or_res)
             if or_res == 1:
                 cost_prime += 1
-        # if cost_prime <= max_now:
-        #     break
-        print('cost_prime is :', cost_prime)
 
         delta = cost_prime - cost
-        if delta > 0:
-            X[i] = curr[i]
-            print('delta was positive and X is:', X)
 
-        else:
-            p = 1 / (1 + exp(-delta / temperature))
-            rand_num = random.random()
-            if rand_num < p:  # go to that neighbour with probability p
+        p = 1 / (1 + exp(-delta / temperature))
+        rand_num = random.random()
+        if rand_num < p:  # go to that neighbour with probability p
+            curr[i] = xor(curr[i], 1)
+            cost = 0
+            for q in clauses_val_new:
+                or_res = 0
+                for j in q:
+                    or_res = or_(j, or_res)
+                if or_res == 1:
+                    cost += 1
+
+            cost_prime = 0
+            clauses_val_new_2 = cal_clause_val(clauses, X)
+            for s in clauses_val_new_2:
+                or_res = 0
+                for t in s:
+                    or_res = or_(t, or_res)
+                if or_res == 1:
+                    cost_prime += 1
+
+            delta = cost - cost_prime
+            if delta > 0:
                 X[i] = curr[i]
-                print(f'delta was negative but rand_num{rand_num}<p{p} and X is{X}:', X)
-            else:
-                print('delta negative X is:', X)
 
         # -------max
         if cost > max_now:
@@ -96,13 +101,11 @@ while True:
         elif cost_prime > max_now:
             max_now = cost_prime
 
-    if cost_prime == max_now:
-        break
-
     cou += 1
 
+print(max_now)
+print(''.join([str(i) for i in X]))
 
-print('final X:', X)
-print('final max:', max_now)
+
 
 

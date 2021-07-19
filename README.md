@@ -1,4 +1,5 @@
-# AI-HW-IUT
+# AI HW IUT
+Codes of my Artificial Intelligence course 
 
 ## HW1: <br/>
 programming questions:
